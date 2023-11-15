@@ -74,15 +74,16 @@ def generar_json(nombre_archivo, lista_superheroes, nombre_lista):
         return False
     
 def normalizar_datos(lista_superheroes):
-    # Implementar la lógica de normalización aquí
-    # Puedes realizar ajustes según tus necesidades específicas
     lista_normalizada = []
 
     for heroe in lista_superheroes:
-        heroe["altura"] = float(heroe["altura"])
-        heroe["peso"] = float(heroe["peso"])
-        heroe["fuerza"] = int(heroe["fuerza"])
-        
+        try:
+            heroe["altura"] = float(heroe["altura"]) if heroe["altura"] else None
+            heroe["peso"] = float(heroe["peso"]) if heroe["peso"] else None
+            heroe["fuerza"] = int(heroe["fuerza"]) if heroe["fuerza"] else None
+        except ValueError as e:
+            print(f"Error al convertir valores: {e}. Ignorando este héroe.")
+            continue
 
         lista_normalizada.append(heroe)
 
@@ -107,7 +108,7 @@ def ordenar_heroes_ascendente(heroes, clave):
     n = len(heroes)
     for i in range(n):
         for j in range(0, n-i-1):
-            if float(heroes[j][clave]) > float(heroes[j+1][clave]):
+            if float(heroes[j][clave]) < float(heroes[j+1][clave]):
                 heroes[j], heroes[j+1] = heroes[j+1], heroes[j]
     return heroes
 
@@ -115,7 +116,7 @@ def ordenar_heroes_descendente(heroes, clave):
     n = len(heroes)
     for i in range(n):
         for j in range(0, n-i-1):
-            if float(heroes[j][clave]) < float(heroes[j+1][clave]):
+            if float(heroes[j][clave]) > float(heroes[j+1][clave]):
                 heroes[j], heroes[j+1] = heroes[j+1], heroes[j]
     return heroes
 
@@ -123,12 +124,18 @@ def ordenar_heroes_por_clave(heroes, clave):
     direccion = input("¿Cómo quieres ordenar los héroes? ('asc' para ascendente, 'desc' para descendente): ").lower()
     
     if direccion == 'asc':
-        return ordenar_heroes_ascendente(heroes, clave)
+        heroes_ordenados = ordenar_heroes_ascendente(heroes, clave)
     elif direccion == 'desc':
-        return ordenar_heroes_descendente(heroes, clave)
+        heroes_ordenados = ordenar_heroes_descendente(heroes, clave)
     else:
         print("Opción no válida. Se devolverá la lista sin ordenar.")
         return heroes
+
+    print(f"Lista de héroes ordenados por {clave.upper()} de manera {direccion.upper()}:")
+    for heroe in heroes_ordenados:
+        print(heroe)
+
+    return heroes_ordenados
     
 
 

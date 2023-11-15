@@ -62,56 +62,50 @@ def stark_imprimir_nombre_con_iniciales_dos(lista_heroes:list):
     return cadena
 
 
-def generar_codigo_heroe(heroe:dict, id:int):
-    genero = heroe.get('genero', '').upper()
+def generar_codigo_heroe(heroe, id):
+    # Validar que el parámetro heroe sea un diccionario y contenga la clave 'genero'
+    if not isinstance(heroe, dict) or 'genero' not in heroe:
+        return 'N/A'
 
-    if genero != "M" and genero != "F" and genero != "NB":
-        return "N/A"
-    
-    if genero == "M":
-        code = "1"
-    else:
-        if genero == "F":
-            code = "2"
-        else:
-            if genero == "NB":
-                code = "0"
-    
-    code = str(id).zfill(7)
+    # Obtener el género del héroe
+    genero = heroe['genero']
+
+    # Validar que el género sea uno de los valores esperados
+    if genero not in ['M', 'F', 'NB']:
+        return 'N/A'
+
+    # Determinar el primer número del código según el género
+    primer_numero = {'M': '1', 'F': '2', 'NB': '0'}[genero]
+
+    # Formatear el código
+    codigo = f"{genero}-{primer_numero}{'0' * (7 - len(str(id)))}{id}"
+
+    return codigo
 
 
-    if len(code) >10:
-        return "N/A"
-    else:
-        return f"{genero}-{code}"
-    
-
-def stark_generar_codigo_heroes(lista_heroes:list):
-    for personaje in range(len(lista_heroes)):
-        if type(lista_heroes[personaje]) == dict and len(lista_heroes) > 0:
-            codigo = generar_codigo_heroe(lista_heroes[personaje], personaje + 1)
-            print(f"*{lista_heroes[personaje]['nombre']}({extraer_iniciales(lista_heroes[personaje]['nombre'])})|  {codigo}")
+def stark_generar_codigo_heroes(lista_heroes: list):
+    for personaje, heroe in enumerate(lista_heroes, start=1):
+        if isinstance(heroe, dict) and 'nombre' in heroe:
+            codigo = generar_codigo_heroe(heroe, personaje)
+            print(f"*{heroe['nombre']}({extraer_iniciales(heroe['nombre'])})|  {codigo}")
         else:
             return False
-    
 
-
-def sanitizar_entero(numero_str):
-    if type(numero_str) == int:
-        return numero_str
-
-    numero_str = re.sub(r"^\s+|\s+$", "", str(numero_str))
     
-    if re.match(r"^-?\d+$", numero_str):
-        return int(numero_str)
-    
-    return "N/A"
+def sanitizar_entero(numero_str: str):
+    try:
+        numero_entero = int(numero_str)
+        if numero_entero >= 0:
+            return numero_entero
+    except (ValueError, TypeError):
+        pass
+
+    return None
 
 
 def sanitizar_flotante(numero_str: str):
     resultado = None
 
-    # Si el número_str es un objeto float, simplemente devuélvelo
     if type(numero_str) == float:
         return numero_str
 
@@ -122,36 +116,25 @@ def sanitizar_flotante(numero_str: str):
         if numero >= 0:
             resultado = numero
         else:
-            resultado = -2  # Número negativo
+            resultado = None  # Número negativo
     else:
-        resultado = -1  
+        resultado = None  # Si no es un número válido
 
     return resultado
 
 
-def sanitizar_string(valor_str:str, valor_por_defecto='-'):
-    if type(valor_str) == int:
-        valor_str = str(valor_str)
+def sanitizar_string(valor_str, valor_por_defecto=None):
+    if valor_str is None or valor_str.strip() == "":
+        return valor_por_defecto
 
-    valor_str = re.sub(r"^\s+|\s+$", "", valor_str)
-    valor_por_defecto = re.sub(r"^\s+|\s+$", "", valor_por_defecto)
+    valor_str = str(valor_str).strip()
 
     if re.match(r"^[a-zA-Z\s]*$", valor_str):
         valor_str = valor_str.replace('/', ' ')
-        retorno = valor_por_defecto.lower()  # Convertir
-    elif valor_str == "" and valor_por_defecto:
-        retorno = valor_por_defecto.lower()
+        return valor_str.lower()
     else:
-        return "N/A"
+        return valor_por_defecto
 
-    return retorno
-def sanitizar_dato(heroe:dict, clave:str, tipo_dato:str):
-    tipo_dato = tipo_dato.lower()
-
-    if tipo_dato == "entero" or tipo_dato == "flotante" or tipo_dato == "string":
-
-
-        pass
 
 def sanitizar_dato(heroe:dict, clave:str, tipo_dato:str):
         # Validar que tipo_dato sea uno de los valores permitidos
@@ -169,7 +152,7 @@ def sanitizar_dato(heroe:dict, clave:str, tipo_dato:str):
     valor = heroe[clave]
 
     # Sanitizar el valor dependiendo del tipo de dato
-      # Sanitizar el valor dependiendo del tipo de dato
+    # Sanitizar el valor dependiendo del tipo de dato
     if tipo_dato == 'string':
         heroe[clave] = sanitizar_string(valor)
     elif tipo_dato == 'entero':
@@ -224,7 +207,7 @@ def generar_encabezado(titulo:str):
     return encabezado
 
 
-def imprimir_ficha_heroe(heroe:dict):
+def imprimir_ficha_heroe(heroe: dict):
     separador_largo = generar_separador('*', 80)
     separador_corto = generar_separador('*', 30)
     titulo_principal = generar_encabezado("Principal")
@@ -234,11 +217,18 @@ def imprimir_ficha_heroe(heroe:dict):
     # Obtener datos del héroe
     nombre_heroe = sanitizar_string(heroe.get("nombre", ""))
     nombre_codigo = generar_codigo_heroe(heroe, 1)
-    identidad_secreta = sanitizar_string(heroe.get("identidad_secreta", ""))
-    consultora = sanitizar_string(heroe.get("consultora", ""))
+    identidad_secreta = sanitizar_string(heroe.get("identidad", ""))
+    consultora = sanitizar_string(heroe.get("empresa", ""))
     altura = sanitizar_flotante(heroe.get("altura", ""))
     peso = sanitizar_flotante(heroe.get("peso", ""))
-    fuerza = sanitizar_entero(heroe.get("fuerza", ""))
+    
+    # Manejar el caso de fuerza como float
+    fuerza_heroe = sanitizar_entero(heroe.get("fuerza", ""))
+    if fuerza_heroe is None:
+        fuerza_heroe = "N/A N"
+    else:
+        fuerza_heroe = f"{fuerza_heroe}"
+
     color_ojos = sanitizar_string(heroe.get("color_ojos", ""))
     color_pelo = sanitizar_string(heroe.get("color_pelo", ""))
 
@@ -256,13 +246,14 @@ def imprimir_ficha_heroe(heroe:dict):
     print(separador_corto)
     print(f"ALTURA: {altura} cm.")
     print(f"PESO: {peso} kg.")
-    print(f"FUERZA: {fuerza} N")
+    print(f"FUERZA TOTAL: {fuerza_heroe}")
 
     print(separador_corto)
     print(titulo_senas_particulares)
     print(separador_corto)
     print(f"COLOR DE OJOS: {color_ojos}")
     print(f"COLOR DE PELO: {color_pelo}")
+
 
 
 def stark_navegar_fichas(lista_heroes):
@@ -292,8 +283,8 @@ def stark_navegar_fichas(lista_heroes):
         else:
             # Opción no válida
             print("Opción no válida. Por favor, elija una opción válida.")
-
-
+            
+            
 def imprimir_menu_principal():
     print("Menú Principal:")
     print("1 - Imprimir la lista de nombres junto con sus iniciales")
@@ -303,32 +294,30 @@ def imprimir_menu_principal():
     print("5 - Navegar fichas")
     print("6 - Salir")
 
-def stark_menu_principal(lista_heroes):
+
+def stark_menu_principal(lista_heroes):            
     while True:
-        imprimir_menu_principal()
-        opcion = input("Ingrese el número de la opción deseada: ")
+            imprimir_menu_principal()
+            opcion = input("Ingrese el número de la opción deseada: ")
 
-        if opcion == '1':
-            # Imprimir la lista de nombres junto con sus iniciales
-            stark_imprimir_nombre_con_iniciales(lista_heroes)
-        elif opcion == '2':
-            # Imprimir la lista de nombres y el código del mismo
-            stark_generar_codigo_heroes(lista_heroes)
-        elif opcion == '3':
-            # Normalizar datos
-            stark_normalizar_datos(lista_heroes)
-            print("Datos normalizados")
-        elif opcion == '4':
-            # Imprimir índice de nombres
-            stark_imprimir_indice_nombre(lista_heroes)
-        elif opcion == '5':
-            # Navegar fichas
-            stark_navegar_fichas(lista_heroes)
-        elif opcion == '6':
-            # Salir
-            break
-        else:
-            print("Opción no valida. Por favor, ingrese un número válido.")
-
-
-
+            if opcion == '1':
+                # Imprimir la lista de nombres junto con sus iniciales
+                stark_imprimir_nombre_con_iniciales(lista_heroes)
+            elif opcion == '2':
+                # Imprimir la lista de nombres y el código del mismo
+                stark_generar_codigo_heroes(lista_heroes)
+            elif opcion == '3':
+                # Normalizar datos
+                stark_normalizar_datos(lista_heroes)
+                print("Datos normalizados")
+            elif opcion == '4':
+                # Imprimir índice de nombres
+                stark_imprimir_indice_nombre(lista_heroes)
+            elif opcion == '5':
+                # Navegar fichas
+                stark_navegar_fichas(lista_heroes)
+            elif opcion == '6':
+                # Salir
+                break
+            else:
+                print("Opción no valida. Por favor, ingrese un número válido.")
