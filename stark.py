@@ -18,7 +18,7 @@ def mostrar_datos_heroes():
 
 
 while True:
-    opciones = input("\nA (Datos de cada superhéro  e)\nB (Identidad y peso del superhéroe con mayor fuerza)\nC (Nombre e identidad del superhéroe más bajo)\nD (Peso promedio de los super héroes masculinos)\nE (Nombre y peso de los superhéroes)\nF (para salir) \nseleciones opcion:")
+    opciones = input("\nA (Datos de cada superhéro  e)\nB (Identidad y peso del superhéroe con mayor fuerza)\nC (Nombre e identidad del superhéroe más bajo)\nD (Peso promedio de los super héroes masculinos)\nE (Nombre y peso de los superhéroes cuales supete la fuerza promedio de las superheroes femeninas)\nF (para salir) \nseleciones opcion:")
 
     if opciones == "A":
         mostrar_datos_heroes()

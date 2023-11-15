@@ -212,7 +212,7 @@ def sumar_dato_heroes(lista:list, key:str):
                 return False
     return suma
 
-def dividir(dividendo:int,divisor:int):#devuelve el resultadod e la divicion
+def dividir(dividendo:int,divisor:int):
     """
     Realiza una división entre dos números enteros y devuelve el resultado.
 
@@ -231,7 +231,7 @@ def dividir(dividendo:int,divisor:int):#devuelve el resultadod e la divicion
         resustado = dividendo / divisor
     return resustado
 
-def calcular_promedio(lista:list,key:str)-> float:#devolvera el promedo del dato que se quiera sacar
+def calcular_promedio(lista:list,key:str)-> float:
     """
 Calcula el promedio de un atributo específico en una lista de superhéroes.
 
@@ -391,7 +391,7 @@ Returns:
     
     for heroe in lista:
         if heroe.get("genero", "").upper() == genero.upper():
-            altura = heroe.get("altura", 0)  # Obtenemos la altura del superhéroe
+            altura = heroe.get("altura", 0)  #la altura del superhéroe
             if altura > max_altura:
                 max_altura = altura
                 superheroe_mas_alto = heroe
@@ -416,7 +416,7 @@ Returns:
     
     for heroe in lista:
         if heroe.get("genero", "").upper() == genero.upper():
-            fuerza = heroe.get("fuerza", 0)  # Obtenemos la fuerza del superhéroe
+            fuerza = heroe.get("fuerza", 0)  
             if min_fuerza == None or (fuerza < min_fuerza):
                 min_fuerza = fuerza
                 superheroe_mas_debil = heroe
@@ -465,10 +465,10 @@ def contar_atributo(lista: list, color: str):
         dict: Un diccionario que contiene cada valor único del atributo como clave y la cantidad de superhéroes
         que tienen ese valor como valor.
     """
-    contador_color = {}  # Un diccionario para contar los valores del atributo
+    contador_color = {}  
     
     for heroe in lista:
-        valor_color = heroe.get(color, "")  # Obtenemos el valor del atributo del superhéroe
+        valor_color = heroe.get(color, "")  
         
         contador_color[valor_color] = contador_color.get(valor_color, 0) + 1
     
